@@ -100,7 +100,7 @@ namespace MultiServerChat
             RestHelper.SendChatMessage(args.Player, args.TShockFormattedText);
         }
 
-        private void OnJoin(JoinEventArgs args)
+        private void OnGreetPlayer(JoinEventArgs args)
         {
             if (!Config.DisplayJoinLeave)
                 return;
@@ -109,7 +109,8 @@ namespace MultiServerChat
             if (ply == null)
                 return;
 
-            RestHelper.SendJoinMessage(ply);
+            if (ply.ReceivedInfo)
+                RestHelper.SendJoinMessage(ply);
         }
 
         private void OnLeave(LeaveEventArgs args)
@@ -121,7 +122,8 @@ namespace MultiServerChat
             if (ply == null)
                 return;
 
-            RestHelper.SendLeaveMessage(ply);
+            if (ply.ReceivedInfo)
+                RestHelper.SendLeaveMessage(ply);
         }
     }
 }
