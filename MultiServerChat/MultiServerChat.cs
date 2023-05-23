@@ -7,7 +7,6 @@ using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Web;
-using HttpServer;
 using Microsoft.Xna.Framework;
 using Newtonsoft.Json;
 using Rests;
@@ -41,7 +40,7 @@ namespace MultiServerChat
             ServerApi.Hooks.GameInitialize.Register(this, OnInitialize);
             GeneralHooks.ReloadEvent += OnReload;
             PlayerHooks.PlayerChat += OnChat;
-            ServerApi.Hooks.ServerJoin.Register(this, OnJoin, 10);
+            ServerApi.Hooks.ServerJoin.Register(this, OnGreetPlayer, 10);
             ServerApi.Hooks.ServerLeave.Register(this, OnLeave, 10);
             TShock.RestApi.Register(new SecureRestCommand("/msc", RestChat, "msc.canchat"));
             TShock.RestApi.Register(new SecureRestCommand("/jl", RestChat, "msc.canchat"));
@@ -53,7 +52,7 @@ namespace MultiServerChat
             {
                 PlayerHooks.PlayerChat -= OnChat;
                 GeneralHooks.ReloadEvent -= OnReload;
-                ServerApi.Hooks.ServerJoin.Deregister(this, OnJoin);
+                ServerApi.Hooks.ServerJoin.Deregister(this, OnGreetPlayer);
                 ServerApi.Hooks.ServerLeave.Deregister(this, OnLeave);
             }
             base.Dispose(disposing);
@@ -63,7 +62,7 @@ namespace MultiServerChat
         {
             Commands.ChatCommands.Add(new Command("msc.reload", ReloadCmd, "msc_reload")
             {
-                HelpText = string.Format("Usage: {0}msc_reload", TShock.Config.CommandSpecifier)
+                HelpText = string.Format("Usage: {0}msc_reload", TShock.Config.Settings.CommandSpecifier)
             });
         }
 

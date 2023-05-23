@@ -19,7 +19,7 @@ namespace MultiServerChat
                 var message = new Message()
                 {
                     Text = String.Format(MultiServerChat.Config.ChatFormat,
-                                            TShock.Config.ServerName,
+                                            TShock.Config.Settings.ServerName,
                                             formatted_text),
                     Red = ply.Group.R,
                     Green = ply.Group.G,
@@ -61,7 +61,7 @@ namespace MultiServerChat
                 var message = new Message()
                 {
                     Text =
-                        String.Format(MultiServerChat.Config.JoinFormat, TShock.Config.ServerName, ply.Name),
+                        String.Format(MultiServerChat.Config.JoinFormat, TShock.Config.Settings.ServerName, ply.Name),
                     Red = Color.Yellow.R,
                     Green = Color.Yellow.G,
                     Blue = Color.Yellow.B
@@ -102,7 +102,7 @@ namespace MultiServerChat
                 var message = new Message()
                 {
                     Text =
-                        String.Format(MultiServerChat.Config.LeaveFormat, TShock.Config.ServerName, ply.Name),
+                        String.Format(MultiServerChat.Config.LeaveFormat, TShock.Config.Settings.ServerName, ply.Name),
                     Red = Color.Yellow.R,
                     Green = Color.Yellow.G,
                     Blue = Color.Yellow.B
