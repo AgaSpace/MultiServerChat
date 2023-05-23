@@ -11,14 +11,16 @@ namespace MultiServerChat
 {
     public static class RestHelper
     {
+        public static HttpClient client = new HttpClient();
+
         public static void SendChatMessage(TSPlayer ply, string formatted_text)
         {
-            ThreadPool.QueueUserWorkItem(f =>
+            ThreadPool.QueueUserWorkItem(async f =>
             {
                 bool failure = false;
                 var message = new Message()
                 {
-                    Text = String.Format(MultiServerChat.Config.ChatFormat,
+                    Text = String.Format(MultiServerChat.Config.Settings.ChatFormat,
                                             TShock.Config.Settings.ServerName,
                                             formatted_text),
                     Red = ply.Group.R,
@@ -29,14 +31,14 @@ namespace MultiServerChat
                 var bytes = Encoding.UTF8.GetBytes(message.ToString());
                 var base64 = Convert.ToBase64String(bytes);
                 var encoded = HttpUtility.UrlEncode(base64);
-                foreach (var url in MultiServerChat.Config.RestURLs)
+                foreach (var url in MultiServerChat.Config.Settings.RestURLs)
                 {
-                    var uri = String.Format("{0}/jl?message={1}&token={2}", url, encoded, MultiServerChat.Config.Token);
+                    var uri = String.Format("{0}/jl?message={1}&token={2}", url, encoded, MultiServerChat.Config.Settings.Token);
 
                     try
                     {
-                        var request = (HttpWebRequest)WebRequest.Create(uri);
-                        using (var res = request.GetResponse())
+                        //var request = await client.GetAsync(uri);//(HttpWebRequest)WebRequest.Create(uri);
+                        using (await client.GetAsync(uri))
                         {
                         }
                         failure = false;
@@ -55,13 +57,13 @@ namespace MultiServerChat
 
         public static void SendJoinMessage(TSPlayer ply)
         {
-            ThreadPool.QueueUserWorkItem(f =>
+            ThreadPool.QueueUserWorkItem(async f =>
             {
                 bool failure = false;
                 var message = new Message()
                 {
                     Text =
-                        String.Format(MultiServerChat.Config.JoinFormat, TShock.Config.Settings.ServerName, ply.Name),
+                        String.Format(MultiServerChat.Config.Settings.JoinFormat, TShock.Config.Settings.ServerName, ply.Name),
                     Red = Color.Yellow.R,
                     Green = Color.Yellow.G,
                     Blue = Color.Yellow.B
@@ -70,14 +72,14 @@ namespace MultiServerChat
                 var bytes = Encoding.UTF8.GetBytes(message.ToString());
                 var base64 = Convert.ToBase64String(bytes);
                 var encoded = HttpUtility.UrlEncode(base64);
-                foreach (var url in MultiServerChat.Config.RestURLs)
+                foreach (var url in MultiServerChat.Config.Settings.RestURLs)
                 {
-                    var uri = String.Format("{0}/jl?message={1}&token={2}", url, encoded, MultiServerChat.Config.Token);
+                    var uri = String.Format("{0}/jl?message={1}&token={2}", url, encoded, MultiServerChat.Config.Settings.Token);
 
                     try
                     {
-                        var request = (HttpWebRequest)WebRequest.Create(uri);
-                        using (var res = request.GetResponse())
+                        //var request = (HttpWebRequest)WebRequest.Create(uri);
+                        using (await client.GetAsync(uri))
                         {
                         }
                         failure = false;
@@ -96,13 +98,13 @@ namespace MultiServerChat
 
         public static void SendLeaveMessage(TSPlayer ply)
         {
-            ThreadPool.QueueUserWorkItem(f =>
+            ThreadPool.QueueUserWorkItem(async f =>
             {
                 bool failure = false;
                 var message = new Message()
                 {
                     Text =
-                        String.Format(MultiServerChat.Config.LeaveFormat, TShock.Config.Settings.ServerName, ply.Name),
+                        String.Format(MultiServerChat.Config.Settings.LeaveFormat, TShock.Config.Settings.ServerName, ply.Name),
                     Red = Color.Yellow.R,
                     Green = Color.Yellow.G,
                     Blue = Color.Yellow.B
@@ -111,14 +113,14 @@ namespace MultiServerChat
                 var bytes = Encoding.UTF8.GetBytes(message.ToString());
                 var base64 = Convert.ToBase64String(bytes);
                 var encoded = HttpUtility.UrlEncode(base64);
-                foreach (var url in MultiServerChat.Config.RestURLs)
+                foreach (var url in MultiServerChat.Config.Settings.RestURLs)
                 {
-                    var uri = String.Format("{0}/jl?message={1}&token={2}", url, encoded, MultiServerChat.Config.Token);
+                    var uri = String.Format("{0}/jl?message={1}&token={2}", url, encoded, MultiServerChat.Config.Settings.Token);
 
                     try
                     {
-                        var request = (HttpWebRequest)WebRequest.Create(uri);
-                        using (var res = request.GetResponse())
+                        //var request = (HttpWebRequest)WebRequest.Create(uri);
+                        using (await client.GetAsync(uri))
                         {
                         }
                         failure = false;

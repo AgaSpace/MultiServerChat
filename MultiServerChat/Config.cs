@@ -5,7 +5,7 @@ using Newtonsoft.Json;
 
 namespace MultiServerChat
 {
-	public class ConfigFile
+	public class MultiServerChatSettings
 	{
         public List<string> RestURLs = new List<string>();
         public string Token = "abcdef";
@@ -16,25 +16,5 @@ namespace MultiServerChat
         public bool SendJoinLeave = true;
         public bool DisplayChat = true;
         public bool DisplayJoinLeave = true;
-
-        public static ConfigFile Read(string path)
-        {
-            if (!File.Exists(path))
-            {
-                ConfigFile config = new ConfigFile();
-                config.RestURLs.Add("http://server1.com:7878/");
-                config.RestURLs.Add("http://server1.com:8205/");
-                config.RestURLs.Add("http://server2.com:7878/");
-
-                File.WriteAllText(path, JsonConvert.SerializeObject(config, Formatting.Indented));
-                return config;
-            }
-            return JsonConvert.DeserializeObject<ConfigFile>(File.ReadAllText(path));
-        }
-
-        /// <summary>
-        /// On config read hook
-        /// </summary>
-		public static Action<ConfigFile> ConfigRead;
 	}
 }

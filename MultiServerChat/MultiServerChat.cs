@@ -14,19 +14,20 @@ using Terraria;
 using TerrariaApi.Server;
 using TShockAPI;
 using TShockAPI.Hooks;
+using TShockAPI.Configuration;
 
 namespace MultiServerChat
 {
     [ApiVersion(2, 1)]
     public class MultiServerChat : TerrariaPlugin
     {
-        public static ConfigFile Config = new ConfigFile();
+        public static ConfigFile<MultiServerChatSettings> Config = new ConfigFile<MultiServerChatSettings>();
         private string savePath;
 
         public override string Author => "Zack Piispanen, now maintained and updated by Ryozuki";
         public override string Description => "Facilitate chat between servers.";
         public override string Name => "Multiserver Chat";
-        public override Version Version => Assembly.GetExecutingAssembly().GetName().Version;
+        public override Version Version => new Version(1, 0, 0, 6);
 
         public MultiServerChat(Main game) : base(game)
         {
@@ -36,12 +37,20 @@ namespace MultiServerChat
         public override void Initialize()
         {
             savePath = Path.Combine(TShock.SavePath, "multiserverchat.json");
-            Config = ConfigFile.Read(savePath);
+
+            Config = new ConfigFile<MultiServerChatSettings>();
+            Config.Read(savePath, out bool write);
+            if (write)
+                Config.Write(savePath);
+
             ServerApi.Hooks.GameInitialize.Register(this, OnInitialize);
+
             GeneralHooks.ReloadEvent += OnReload;
             PlayerHooks.PlayerChat += OnChat;
+
             ServerApi.Hooks.ServerJoin.Register(this, OnGreetPlayer, 10);
             ServerApi.Hooks.ServerLeave.Register(this, OnLeave, 10);
+
             TShock.RestApi.Register(new SecureRestCommand("/msc", RestChat, "msc.canchat"));
             TShock.RestApi.Register(new SecureRestCommand("/jl", RestChat, "msc.canchat"));
         }
@@ -68,20 +77,26 @@ namespace MultiServerChat
 
         private void ReloadCmd(CommandArgs args)
         {
-            Config = ConfigFile.Read(savePath);
+            Config = new ConfigFile<MultiServerChatSettings>();
+            Config.Read(savePath, out bool write);
+            if (write)
+                Config.Write(savePath);
         }
 
         private void OnReload(ReloadEventArgs args)
         {
             if (args.Player.Group.HasPermission("msc.reload"))
             {
-                Config = ConfigFile.Read(savePath);
+                Config = new ConfigFile<MultiServerChatSettings>();
+                Config.Read(savePath, out bool write);
+                if (write)
+                    Config.Write(savePath);
             }
         }
 
         private object RestChat(RestRequestArgs args)
         {
-            if (!Config.DisplayChat)
+            if (!Config.Settings.DisplayChat)
                 return new RestObject();
 
             RestHelper.RecievedMessage(args);
@@ -91,7 +106,7 @@ namespace MultiServerChat
 
         private void OnChat(PlayerChatEventArgs args)
         {
-            if (!Config.SendChat)
+            if (!Config.Settings.SendChat)
                 return;
             if (args.Handled)
                 return;
@@ -101,11 +116,14 @@ namespace MultiServerChat
 
         private void OnGreetPlayer(JoinEventArgs args)
         {
-            if (!Config.DisplayJoinLeave)
+            if (!Config.Settings.DisplayJoinLeave)
                 return;
 
             TSPlayer ply = TShock.Players[args.Who];
             if (ply == null)
+                return;
+
+            if (ply.SilentJoinInProgress)
                 return;
 
             if (ply.ReceivedInfo)
@@ -114,11 +132,14 @@ namespace MultiServerChat
 
         private void OnLeave(LeaveEventArgs args)
         {
-            if (!Config.DisplayJoinLeave)
+            if (!Config.Settings.DisplayJoinLeave)
                 return;
 
             TSPlayer ply = TShock.Players[args.Who];
             if (ply == null)
+                return;
+
+            if (ply.SilentKickInProgress)
                 return;
 
             if (ply.ReceivedInfo)
