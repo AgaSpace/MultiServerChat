@@ -31,7 +31,7 @@ namespace MultiServerChat
 
         public MultiServerChat(Main game) : base(game)
         {
-            
+            base.Order = 10;
         }
 
         public override void Initialize()
